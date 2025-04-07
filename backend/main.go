@@ -3,6 +3,7 @@ package main
 import (
 	"backend/db"
 	"backend/handler"
+	"backend/middleware"
 	"log"
 	"net/http"
 	"os"
@@ -14,6 +15,7 @@ import (
 func main() {
 	e := echo.New()
 	err := godotenv.Load()
+	
 	if err != nil {
         log.Fatal("Error loading .env file")
     }
@@ -22,7 +24,13 @@ func main() {
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!")
 	})
+
 	a := e.Group("/auth")
 	a.POST("/register",userHandler.RegisterUser)
+	a.POST("/login",userHandler.LoginUser)
+
+	api := e.Group("/api")
+	api.Use(middleware.JWTMiddleware)
+	api.GET("/me",userHandler.FetchUserData)
 	e.Logger.Fatal(e.Start(os.Getenv("APP_PORT")))
 }

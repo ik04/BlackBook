@@ -30,21 +30,28 @@ func (r *UserRepository) Create(user *model.User) error {
 
 func (r *UserRepository) GetByID(id uuid.UUID) (*model.User, error) {
 	var user model.User
-	err := r.db.Get(&user, "SELECT * FROM users WHERE id = ?", id.String())
+	query := `SELECT * FROM users WHERE id = ?`
+	err := r.db.Get(&user, query, id)
 	if err != nil {
 		return nil, err
 	}
 	return &user, nil
 }
 
-func (r *UserRepository) GetByEmail(email string) (*model.User, error) {
+func (r *UserRepository) GetByLogin(login string) (*model.User, error) {
 	var user model.User
-	err := r.db.Get(&user, "SELECT * FROM users WHERE email = ?", email)
+	query := `
+		SELECT * FROM users 
+		WHERE email = ? OR username = ? 
+		LIMIT 1
+	`
+	err := r.db.Get(&user, query, login, login)
 	if err != nil {
 		return nil, err
 	}
 	return &user, nil
 }
+
 
 func (r *UserRepository) GetAll() ([]model.User, error) {
 	var users []model.User

@@ -23,3 +23,8 @@ func (req *CreateUserRequest) ToModel(hashedPassword string) *model.User {
 		EmailVerifiedAt: sql.NullTime{Valid: false},
 	}
 }
+
+type LoginRequest struct {
+	Login    string `json:"login" validate:"required"`
+	Password string `json:"password" validate:"required"`
+}
