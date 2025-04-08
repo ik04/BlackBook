@@ -28,8 +28,8 @@ func NewUserHandler(db *sqlx.DB) *UserHandler{
 	}
 }
 
-func (u *UserHandler) RegisterUser(c echo.Context) error {
-	var userRepo = u.userRepo
+func (h *UserHandler) RegisterUser(c echo.Context) error {
+	var userRepo = h.userRepo
 	var req dto.CreateUserRequest
 
 	if err := middleware.BindAndValidate(c, &req); err != nil {
@@ -40,8 +40,8 @@ func (u *UserHandler) RegisterUser(c echo.Context) error {
 	userRepo.Create(user)
 	return c.JSON(http.StatusCreated, echo.Map{"message": "user created"})
 }
-func (u *UserHandler) LoginUser(c echo.Context) error {
-	var userRepo = u.userRepo
+func (h *UserHandler) LoginUser(c echo.Context) error {
+	var userRepo = h.userRepo
 	var req dto.LoginRequest
 
 	if err := middleware.BindAndValidate(c, &req); err != nil {
