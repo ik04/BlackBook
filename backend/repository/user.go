@@ -22,7 +22,7 @@ func (r *UserRepository) Create(user *model.User) error {
 
 	_, err := r.db.NamedExec(`
 		INSERT INTO users (id, email, username, password, email_verified_at)
-		VALUES (:id, :email, :username, :password, :email_verified_at)
+		VALUES (:id, :email, :username, :password, NULL)
 	`, user)
 
 	return err
@@ -57,4 +57,8 @@ func (r *UserRepository) GetAll() ([]model.User, error) {
 	var users []model.User
 	err := r.db.Select(&users, "SELECT * FROM users")
 	return users, err
+}
+
+func (r *UserRepository) UpdateEmailVerifiedAt(){
+	// * implement timestamp param and udate via plunk or something else
 }

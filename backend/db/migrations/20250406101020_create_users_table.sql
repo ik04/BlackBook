@@ -10,11 +10,11 @@ CREATE TABLE users(
 
 CREATE INDEX idx_users_name ON users(username);
 CREATE INDEX idx_users_email ON users(email);
-
 -- +goose StatementEnd
 
 -- +goose Down
 -- +goose StatementBegin
+DROP INDEX idx_contacts_user_id;
 DROP INDEX idx_users_name;
 DROP INDEX idx_users_email;
 
