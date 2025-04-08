@@ -21,6 +21,8 @@ func main() {
     }
 	conn := db.Init()
 	userHandler := handler.NewUserHandler(conn)
+	contactHandler := handler.NewContactHandler(conn)
+
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!")
 	})
@@ -32,5 +34,14 @@ func main() {
 	api := e.Group("/api")
 	api.Use(middleware.JWTMiddleware)
 	api.GET("/me",userHandler.FetchUserData)
+
+	contacts := api.Group("/contacts")
+	contacts.POST("", contactHandler.CreateContact)
+	contacts.GET("", contactHandler.GetAllContacts)
+	contacts.GET("/:id", contactHandler.GetContactByID)
+	contacts.PUT("/:id", contactHandler.UpdateContact)
+	contacts.DELETE("/:id", contactHandler.DeleteContact)
+
+
 	e.Logger.Fatal(e.Start(os.Getenv("APP_PORT")))
 }
