@@ -5,7 +5,6 @@ CREATE TABLE contacts (
     user_id UUID NOT NULL,
     name VARCHAR(255) NOT NULL,
     phone_number VARCHAR(255) NOT NULL,
-    profile_picture VARCHAR(255),
     description VARCHAR(255),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 
