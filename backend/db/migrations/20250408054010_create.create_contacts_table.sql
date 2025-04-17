@@ -7,8 +7,6 @@ CREATE TABLE contacts (
     phone_number VARCHAR(255) NOT NULL,
     description VARCHAR(255),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-
-
 );
 CREATE INDEX idx_contacts_phone_number ON contacts(phone_number);
 CREATE INDEX idx_contacts_name ON contacts(name);

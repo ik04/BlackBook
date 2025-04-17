@@ -4,6 +4,6 @@ import "github.com/google/uuid"
 
 type Tag struct{
 	ID uuid.UUID `db:"id"`
-	UserID uuid.UUID `db:"user_id"`
+	UserID string `db:"user_id"`
 	Name string `db:"name"`
 }
