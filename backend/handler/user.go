@@ -80,27 +80,44 @@ func (h *UserHandler) LoginUser(c echo.Context) error {
 }
 
 func (h *UserHandler) FetchUserData(c echo.Context) error {
-	userIDRaw := c.Get("user_id")
-	userIDStr, ok := userIDRaw.(string)
+	cookie, err := c.Cookie("at")
+	if err != nil {
+		return echo.NewHTTPError(http.StatusUnauthorized, "Missing access token cookie")
+	}
+
+	token, err := jwt.Parse(cookie.Value, func(t *jwt.Token) (interface{}, error) {
+		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, echo.NewHTTPError(http.StatusUnauthorized, "Unexpected signing method")
+		}
+		return []byte(os.Getenv("JWT_SECRET")), nil
+	})
+	if err != nil || !token.Valid {
+		return echo.NewHTTPError(http.StatusUnauthorized, "Invalid or expired token")
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok || claims["user_id"] == nil {
+		return echo.NewHTTPError(http.StatusUnauthorized, "Invalid token claims")
+	}
+
+	userIDStr, ok := claims["user_id"].(string)
 	if !ok || userIDStr == "" {
-		return echo.NewHTTPError(http.StatusUnauthorized, "User ID not in context")
+		return echo.NewHTTPError(http.StatusUnauthorized, "User ID not in token")
 	}
 
 	userID, err := uuid.Parse(userIDStr)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "invalid user ID format in token")
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid user ID format")
 	}
 
 	user, err := h.userRepo.GetByID(userID)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return echo.NewHTTPError(http.StatusNotFound, "user not found")
+			return echo.NewHTTPError(http.StatusNotFound, "User not found")
 		}
-		return echo.NewHTTPError(http.StatusInternalServerError, "could not fetch user")
+		return echo.NewHTTPError(http.StatusInternalServerError, "Could not fetch user")
 	}
 
 	user.Password = ""
-
 	return c.JSON(http.StatusOK, dto.NewUserResponse(user))
 }
-
